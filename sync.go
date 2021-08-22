@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func WaitGroup() {
+func goroutine() {
 	var wg sync.WaitGroup
 	sayHello := func() {
 		defer wg.Done()
@@ -19,7 +19,7 @@ func WaitGroup() {
 	wg.Wait()
 }
 
-func WaitGroup2() {
+func goroutine2() {
 	var wg sync.WaitGroup
 	salutation := "hello"
 	wg.Add(1)
@@ -31,7 +31,7 @@ func WaitGroup2() {
 	fmt.Println(salutation)
 }
 
-func WaitGroup3() {
+func goroutine3() {
 	var wg sync.WaitGroup
 	for _, salutation := range []string{"hello", "greetings", "good day"} {
 		wg.Add(1)
@@ -43,7 +43,7 @@ func WaitGroup3() {
 	wg.Wait()
 }
 
-func WaitGroup4() {
+func goroutine4() {
 	var wg sync.WaitGroup
 	for _, salutation := range []string{"hello", "greetings", "good day"} {
 		wg.Add(1)
@@ -55,7 +55,7 @@ func WaitGroup4() {
 	wg.Wait()
 }
 
-func WaitGroup5() {
+func goroutine5() {
 	memConsumed := func() uint64 {
 		runtime.GC()
 		var s runtime.MemStats
@@ -76,4 +76,40 @@ func WaitGroup5() {
 	wg.Wait()
 	after := memConsumed()
 	fmt.Printf("%.3fkb", float64(after-before)/numGoroutines/1000)
+}
+
+func waitGroup() {
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		fmt.Println("1st goroutine sleeping...")
+		time.Sleep(1)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		fmt.Println("2nd goroutine sleeping...")
+		time.Sleep(2)
+	}()
+
+	wg.Wait()
+	fmt.Println("All goroutine complete.")
+}
+
+func waitGroup2() {
+	hello := func(wg *sync.WaitGroup, id int) {
+		defer wg.Done()
+		fmt.Printf("Hello from %d\n", id)
+	}
+
+	const numGreeter = 5
+	var wg sync.WaitGroup
+	wg.Add(numGreeter)
+	for i := 0; i < numGreeter; i++ {
+		go hello(&wg, i+1)
+	}
+	wg.Wait()
 }
